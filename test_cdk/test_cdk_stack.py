@@ -1,6 +1,8 @@
+import uuid
 from aws_cdk import (
     Stack,
     aws_s3 as s3,
+    RemovalPolicy,  # <-- import from top-level
 )
 from constructs import Construct
 
@@ -9,12 +11,15 @@ class TestCdkStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        # Create a simple S3 bucket
+        # Generate a unique bucket name
+        unique_id = str(uuid.uuid4())[:8]
+        bucket_name = f"test-cdk-bucket-{unique_id}"
+
         s3.Bucket(
             self,
-            "TestBucket-cdk",
-            bucket_name="test-cdk-bucket-unique-12345",  # must be globally unique
+            "TestBucket",
+            bucket_name=bucket_name,
             versioned=True,
-            removal_policy=s3.RemovalPolicy.DESTROY,  # delete bucket when stack is destroyed
-            auto_delete_objects=True                  # deletes objects automatically when removing stack
+            removal_policy=RemovalPolicy.DESTROY,  # <-- use top-level RemovalPolicy
+            auto_delete_objects=True
         )
